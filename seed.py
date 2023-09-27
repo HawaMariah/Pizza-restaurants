@@ -1,45 +1,20 @@
-from random import randint, choice as rc
-from faker import Faker
-from app import app
-from models import db, Restaurant, Pizza, RestaurantPizza
-from datetime import datetime
 
-fake = Faker()
+from app import db, app
+from models import Restaurant, Pizza, RestaurantPizza
 
 def seed_data():
     with app.app_context():
         db.create_all()
 
-        RestaurantPizza.query.delete()
-        Restaurant.query.delete()
-        Pizza.query.delete()
+        # Add your seed data here
+        restaurant1 = Restaurant(name="Dominion Pizza", address="Good Italian, Ngong Road, 5th Avenue")
+        restaurant2 = Restaurant(name="Pizza Hut", address="Westgate Mall, Mwanzi Road, Nrb 100")
 
-        restaurants = []
-        for _ in range(20):
-            r = Restaurant(name=fake.company())
-            restaurants.append(r)
+        pizza1 = Pizza(name="Cheese", ingredients="Dough, Tomato Sauce, Cheese")
+        pizza2 = Pizza(name="Pepperoni", ingredients="Dough, Tomato Sauce, Cheese, Pepperoni")
 
-        db.session.add_all(restaurants)
+        restaurant_pizza1 = RestaurantPizza(price=5, pizza=pizza1, restaurant=restaurant1)
+        restaurant_pizza2 = RestaurantPizza(price=7, pizza=pizza2, restaurant=restaurant1)
+
+        db.session.add_all([restaurant1, restaurant2, pizza1, pizza2, restaurant_pizza1, restaurant_pizza2])
         db.session.commit()
-
-        pizzas = []
-        for _ in range(50):
-            p = Pizza(name=fake.word(), price=randint(1, 30), created_at=datetime.now())
-            pizzas.append(p)
-
-        db.session.add_all(pizzas)
-        db.session.commit()
-
-        restaurant_pizzas = []
-        for restaurant in restaurants:
-            num_pizzas = randint(1, 5)
-            sampled_pizzas = rc(pizzas, k=num_pizzas)
-            for pizza in sampled_pizzas:
-                rp = RestaurantPizza(restaurant_id=restaurant.id, pizza_id=pizza.id)
-                restaurant_pizzas.append(rp)
-
-        db.session.add_all(restaurant_pizzas)
-        db.session.commit()
-
-if __name__ == '__main__':
-    seed_data()
