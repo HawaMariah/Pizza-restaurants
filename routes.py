@@ -1,5 +1,5 @@
 from app import app, db
-from flask import jsonify
+from flask import request,jsonify
 from models import Restaurant, Pizza, RestaurantPizza
 
 # Define your routes here
@@ -62,3 +62,28 @@ def get_pizzas():
             'ingredients': pizza.ingredients
         })
     return jsonify(formatted_pizzas)
+
+@app.route('/restaurant_pizzas', methods=['POST'])
+def create_restaurant_pizza():
+    data = request.json
+    price = data.get('price')
+    pizza_id = data.get('pizza_id')
+    restaurant_id = data.get('restaurant_id')
+
+    # Validate input data 
+    if not all([price, pizza_id, restaurant_id]):
+        return jsonify({'errors': ['Missing required fields']}), 400
+
+    
+    try:
+        new_pizza = RestaurantPizza(price=price, pizza_id=pizza_id, restaurant_id=restaurant_id)
+        db.session.add(new_pizza)
+        db.session.commit()
+        pizza = Pizza.query.get(pizza_id)
+        return jsonify({
+            'id': pizza.id,
+            'name': pizza.name,
+            'ingredients': pizza.ingredients
+        }), 201
+    except Exception as e:
+        return jsonify({'errors': [str(e)]}), 400

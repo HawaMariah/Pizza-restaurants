@@ -4,10 +4,9 @@ from models import Restaurant, Pizza, RestaurantPizza
 
 def seed_data():
     with app.app_context():
-        # db.drop_all()
+        #db.drop_all()
         db.create_all()
        
-        # Add your seed data here
         restaurant1 = Restaurant(name="KFC", address="Town Moi Avenue")
         restaurant2 = Restaurant(name="Maveric", address="Syokimau")
         restaurant3 = Restaurant(name="Pizza Palace", address="123 Main Street")
